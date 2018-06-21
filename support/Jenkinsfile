@@ -32,17 +32,19 @@ pipeline {
                 sh "git config --list"
                 sh "git branch"
 
-                def vcdConnectionCredentialsID = params.VCD_CONNECTION_CREDENTIALS_ID
-                if (vcdConnectionCredentialsID.toLowerCase() == 'default') {
-                    vcdConnectionCredentialsID = env.DEFAULT_VCD_CONNECTION_CREDENTIALS_ID
-                }
+                script {
+                    def vcdConnectionCredentialsID = params.VCD_CONNECTION_CREDENTIALS_ID
+                    if (vcdConnectionCredentialsID.toLowerCase() == 'default') {
+                        vcdConnectionCredentialsID = env.DEFAULT_VCD_CONNECTION_CREDENTIALS_ID
+                    }
 
-                if (vcdConnectionCredentialsID.toLowerCase() != "") {
-                    credentialsArray << [
-                        $class: 'FileBinding', 
-                        credentialsId: vcdConnectionCredentialsID,
-                        variable: 'VCD_CONNECTION'
-                    ]
+                    if (vcdConnectionCredentialsID.toLowerCase() != "") {
+                        credentialsArray << [
+                            $class: 'FileBinding', 
+                            credentialsId: vcdConnectionCredentialsID,
+                            variable: 'VCD_CONNECTION'
+                        ]
+                    }
                 }
             }
         }
@@ -60,14 +62,22 @@ pipeline {
         }
         stage('run-samples') {
             steps {
-                // Execute samples. 
-                sh "examples/run_examples.sh"
+                script {
+                    withCredentials(credentialsArray) {
+                        // Execute samples. 
+                        sh "examples/run_examples.sh"
+                    }
+                }
             }
         }
         stage('run-system-test') {
             steps {
-                // Run the default system test list. 
-                sh "system_tests/run_system_tests.sh"
+                script {
+                    withCredentials(credentialsArray) {
+                        // Run the default system test list. 
+                        sh "system_tests/run_system_tests.sh"
+                    }
+                }
             }
         }
     }
