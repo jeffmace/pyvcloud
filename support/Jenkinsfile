@@ -2,16 +2,23 @@
 // This script depends on file $HOME/vcd_connection with valid vCD 
 // connection parameters. 
 
+def credentialsArray = []
+def environmentArray = []
+
 // Pipeline definition.
 pipeline {
     agent { 
         node { 
             // Label on Jenkins node that runs this test. 
-            label 'docker-runner' 
-            // Required to get around problems with long file names when 
-            // Jenkins generates the workspace name automatically. 
-            customWorkspace "/var/jenkins/workspace/${JOB_NAME}"
+            label 'docker'
         }
+    }
+    environment {
+        DEFAULT_VCD_CONNECTION_CREDENTIALS_ID = 'pyvcloud_vcd_connection'
+        PYTHON3_IN_DOCKER = '1'
+    }
+    parameters {
+        string(name: 'VCD_CONNECTION_CREDENTIALS_ID', defaultValue: 'Default')
     }
     stages {
         stage('checkout') {
@@ -20,54 +27,47 @@ pipeline {
                 // Jenkins commands exposed in groovy. 
                 deleteDir()
                 checkout scm
+
                 // Print configuration for later debugging. 
                 sh "git config --list"
                 sh "git branch"
+
+                def vcdConnectionCredentialsID = params.VCD_CONNECTION_CREDENTIALS_ID
+                if (vcdConnectionCredentialsID.toLowerCase() == 'default') {
+                    vcdConnectionCredentialsID = env.DEFAULT_VCD_CONNECTION_CREDENTIALS_ID
+                }
+
+                if (vcdConnectionCredentialsID.toLowerCase() != "") {
+                    credentialsArray << [
+                        $class: 'FileBinding', 
+                        credentialsId: vcdConnectionCredentialsID,
+                        variable: 'VCD_CONNECTION'
+                    ]
+                }
             }
         }
         stage('install') {
             steps {
                 // Set up Python virtual environment and install pyvcloud. 
-                sh """
-                    python3 --version
-                    rm -rf test-env
-                    python3 -m venv test-env
-                    . test-env/bin/activate
-                    pip3 install -r requirements.txt
-                    python setup.py install
-                """
+                sh "support/install.sh"
             }
         }
         stage('run-tox-flake8') {
             steps {
-		// Run tox. 
-                sh """
-                    . test-env/bin/activate
-                    pip3 install -r test-requirements.txt
-                    tox -e flake8
-                """
+        		// Run tox. 
+                sh "support/tox.sh"
             }
         }
         stage('run-samples') {
             steps {
                 // Execute samples. 
-                sh """
-                    set +x
-                    . test-env/bin/activate
-                    cd examples
-                    ./run_examples.sh 
-                """
+                sh "examples/run_examples.sh"
             }
         }
         stage('run-system-test') {
             steps {
                 // Run the default system test list. 
-                sh """
-                    set +x
-                    . test-env/bin/activate
-                    cd system_tests
-                    ./run_system_tests.sh 
-                """
+                sh "system_tests/run_system_tests.sh"
             }
         }
     }

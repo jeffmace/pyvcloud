@@ -9,8 +9,18 @@
 #
 set -e
 
+SHOME=`dirname $0`
+cd $SHOME
+
+SRCROOT=`cd ..; pwd`
+cd $SRCROOT
+
 # Get connection information.  If provided the file name must be absolute. 
-VCD_CONNECTION=$1
+
+if [ -n "$1" ]; then
+  VCD_CONNECTION=$1
+fi
+
 if [ -z "$VCD_CONNECTION" ]; then
   VCD_CONNECTION=$HOME/vcd_connection
   if [ -e $HOME/vcd_connection ]; then
@@ -20,20 +30,57 @@ if [ -z "$VCD_CONNECTION" ]; then
     exit 0
   fi
 fi
-. "$VCD_CONNECTION"
 
-# Prepare a sample tenant yaml file by cat'ing so that environment variables
-# fill in. 
-SCRIPT_DIR=`dirname $0`
-eval "cat <<EOF
-$(<$SCRIPT_DIR/tenant.yaml)
-EOF
-" 2> /dev/null > sample-test-tenant.yaml
+run_examples() {
+  . test-env/bin/activate
+  . "$VCD_CONNECTION"
 
-# From here on out all commands are logged. 
-set -x
-python3 ${SCRIPT_DIR}/system-info.py ${VCD_HOST} ${VCD_ORG} ${VCD_USER} ${VCD_PASSWORD}
-python3 ${SCRIPT_DIR}/tenant-remove.py sample-test-tenant.yaml
-python3 ${SCRIPT_DIR}/tenant-onboard.py sample-test-tenant.yaml
-python3 ${SCRIPT_DIR}/list-vapps.py ${VCD_HOST} Test1 user1 secret VDC-A
-python3 ${SCRIPT_DIR}/list-vdc-resources.py ${VCD_HOST} Test1 user1 secret
+  # Prepare a sample tenant yaml file by cat'ing so that environment variables
+  # fill in. 
+  eval "cat <<EOF
+  $(<$SRCROOT/examples/tenant.yaml)
+  EOF
+  " 2> /dev/null > sample-test-tenant.yaml
+
+  # From here on out all commands are logged. 
+  set -x
+  python3 examples/system-info.py ${VCD_HOST} ${VCD_ORG} ${VCD_USER} ${VCD_PASSWORD}
+  python3 examples/tenant-remove.py sample-test-tenant.yaml
+  python3 examples/tenant-onboard.py sample-test-tenant.yaml
+  python3 examples/list-vapps.py ${VCD_HOST} Test1 user1 secret VDC-A
+  python3 examples/list-vdc-resources.py ${VCD_HOST} Test1 user1 secret
+}
+
+run_examples_in_docker() {
+  docker run --rm \
+  -ePYTHON3_IN_DOCKER=0 \
+  -eVCD_CONNECTION=$VCD_CONNECTION \
+  -v$VCD_CONNECTION:$VCD_CONNECTION \
+  -v$SRCROOT:$SRCROOT \
+  -w$SRCROOT \
+  python:3 /bin/bash -c "\
+  examples/run_examples.sh"
+}
+
+if [ "$PYTHON3_IN_DOCKER" == "" ]; then
+    PYTHON3_PATH=`which python3 | cat`
+    PIP3_PATH=`which pip3 | cat`
+
+    if [ "$PYTHON3_PATH" == "" ]; then
+        PYTHON3_IN_DOCKER=1
+    fi
+
+    if [ "$PIP3_PATH" == "" ]; then
+        PYTHON3_IN_DOCKER=1
+    fi
+fi
+
+if [ "$PYTHON3_IN_DOCKER" == "" ]; then
+    PYTHON3_IN_DOCKER=0
+fi
+
+if [ "$PYTHON3_IN_DOCKER" != "0" ]; then
+    run_examples_in_docker
+else
+    run_examples
+fi
