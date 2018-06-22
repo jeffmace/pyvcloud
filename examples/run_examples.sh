@@ -35,14 +35,15 @@ run_examples() {
   . test-env/bin/activate
   . "$VCD_CONNECTION"
 
+  cd ${SRCROOT}/examples
+
   # Prepare a sample tenant yaml file by cat'ing so that environment variables
   # fill in. 
   eval "cat <<EOF
   $(<$SRCROOT/examples/tenant.yaml)
 EOF
-  " 2> /dev/null > ${SRCROOT}/sample-test-tenant.yaml
+  " 2> /dev/null > sample-test-tenant.yaml
 
-  cd ${SRCROOT}/examples
   # From here on out all commands are logged. 
   set -x
   python3 system-info.py ${VCD_HOST} ${VCD_ORG} ${VCD_USER} ${VCD_PASSWORD}
