@@ -18,12 +18,20 @@ install() {
 }
 
 install_in_docker() {
+    DOCKER_BUILD=`docker build -q \
+        --build-arg build_user=${USER} \
+        --build-arg build_uid=$(id -u) \
+        --build-arg build_gid=$(id -g) \
+        -f support/Dockerfile.build \
+        support`
+    DOCKER_IMAGE=`echo $DOCKER_BUILD | awk -F: '{print $2}'`
+
     docker run --rm \
-    -v$SRCROOT:$SRCROOT \
-    -w$SRCROOT \
-    -u`id -u`:`id -g` \
-    python:3 /bin/bash -c "\
-    support/install.sh"
+        -ePYTHON3_IN_DOCKER=0 \
+        -v$SRCROOT:$SRCROOT \
+        -w$SRCROOT \
+        $DOCKER_IMAGE \
+        /bin/bash -c "support/install.sh"
 }
 
 if [ "$PYTHON3_IN_DOCKER" == "" ]; then
@@ -39,7 +47,11 @@ if [ "$PYTHON3_IN_DOCKER" == "" ]; then
     fi
 fi
 
-if [ "$PYTHON3_IN_DOCKER" != "" ]; then
+if [ "$PYTHON3_IN_DOCKER" == "" ]; then
+    PYTHON3_IN_DOCKER=0
+fi
+
+if [ "$PYTHON3_IN_DOCKER" != "0" ]; then
     install_in_docker
 else
     install

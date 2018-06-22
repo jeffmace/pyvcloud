@@ -83,15 +83,22 @@ run_system_tests() {
 }
 
 run_system_tests_in_docker() {
+  DOCKER_BUILD=`docker build -q \
+    --build-arg build_user=${USER} \
+    --build-arg build_uid=$(id -u) \
+    --build-arg build_gid=$(id -g) \
+    -f support/Dockerfile.build \
+    support`
+  DOCKER_IMAGE=`echo $DOCKER_BUILD | awk -F: '{print $2}'`
+
   docker run --rm \
-  -ePYTHON3_IN_DOCKER=0 \
-  -eVCD_CONNECTION=$VCD_CONNECTION \
-  -v$VCD_CONNECTION:$VCD_CONNECTION \
-  -v$SRCROOT:$SRCROOT \
-  -w$SRCROOT \
-  -u`id -u`:`id -g` \
-  python:3 /bin/bash -c "\
-  system_tests/run_system_tests.sh"
+    -ePYTHON3_IN_DOCKER=0 \
+    -eVCD_CONNECTION=$VCD_CONNECTION \
+    -v$VCD_CONNECTION:$VCD_CONNECTION \
+    -v$SRCROOT:$SRCROOT \
+    -w$SRCROOT \
+    $DOCKER_IMAGE \
+    /bin/bash -c "system_tests/run_system_tests.sh"
 }
 
 if [ "$PYTHON3_IN_DOCKER" == "" ]; then
