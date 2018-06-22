@@ -40,15 +40,16 @@ run_examples() {
   eval "cat <<EOF
   $(<$SRCROOT/examples/tenant.yaml)
 EOF
-  " 2> /dev/null > sample-test-tenant.yaml
+  " 2> /dev/null > ${SRCROOT}/sample-test-tenant.yaml
 
+  cd ${SRCROOT}/examples
   # From here on out all commands are logged. 
   set -x
-  python3 examples/system-info.py ${VCD_HOST} ${VCD_ORG} ${VCD_USER} ${VCD_PASSWORD}
-  python3 examples/tenant-remove.py sample-test-tenant.yaml
-  python3 examples/tenant-onboard.py sample-test-tenant.yaml
-  python3 examples/list-vapps.py ${VCD_HOST} Test1 user1 secret VDC-A
-  python3 examples/list-vdc-resources.py ${VCD_HOST} Test1 user1 secret
+  python3 system-info.py ${VCD_HOST} ${VCD_ORG} ${VCD_USER} ${VCD_PASSWORD}
+  python3 tenant-remove.py sample-test-tenant.yaml
+  python3 tenant-onboard.py sample-test-tenant.yaml
+  python3 list-vapps.py ${VCD_HOST} Test1 user1 secret VDC-A
+  python3 list-vdc-resources.py ${VCD_HOST} Test1 user1 secret
 }
 
 run_examples_in_docker() {
