@@ -39,7 +39,7 @@ run_examples() {
   # fill in. 
   eval "cat <<EOF
   $(<$SRCROOT/examples/tenant.yaml)
-  EOF
+EOF
   " 2> /dev/null > sample-test-tenant.yaml
 
   # From here on out all commands are logged. 
