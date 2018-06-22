@@ -21,6 +21,7 @@ install_in_docker() {
     docker run --rm \
     -v$SRCROOT:$SRCROOT \
     -w$SRCROOT \
+    -u`id -u`:`id -g` \
     python:3 /bin/bash -c "\
     support/install.sh"
 }

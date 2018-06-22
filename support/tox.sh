@@ -17,6 +17,7 @@ exec_tox_in_docker() {
     -ePYTHON3_IN_DOCKER=0 \
     -v$SRCROOT:$SRCROOT \
     -w$SRCROOT \
+    -u`id -u`:`id -g` \
     python:3 /bin/bash -c "\
     support/tox.sh"
 }

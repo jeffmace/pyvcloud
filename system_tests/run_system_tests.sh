@@ -89,6 +89,7 @@ run_system_tests_in_docker() {
   -v$VCD_CONNECTION:$VCD_CONNECTION \
   -v$SRCROOT:$SRCROOT \
   -w$SRCROOT \
+  -u`id -u`:`id -g` \
   python:3 /bin/bash -c "\
   system_tests/run_system_tests.sh"
 }

@@ -58,6 +58,7 @@ run_examples_in_docker() {
   -v$VCD_CONNECTION:$VCD_CONNECTION \
   -v$SRCROOT:$SRCROOT \
   -w$SRCROOT \
+  -u`id -u`:`id -g` \
   python:3 /bin/bash -c "\
   examples/run_examples.sh"
 }
