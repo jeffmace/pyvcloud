@@ -30,36 +30,36 @@ pipeline {
                 // Jenkins commands exposed in groovy. 
                 deleteDir()
 
-                def overrideGit = false
-                if (params.OVERRIDE_GIT_REPOSITORY != null) {
-                    if (params.OVERRIDE_GIT_REPOSITORY != '') {
-                        overrideGit = true
-                    }
-                }
-
-                if (overrideGit == false) {
-                    checkout scm
-                } else {
-                    def git_treeish = params.OVERRIDE_GIT_TREEISH
-                    def git_remote_config = [:]
-                    git_remote_config['url'] = params.OVERRIDE_GIT_REPOSITORY
-
-                    if (params.OVERRIDE_GIT_CREDENTIALS_ID != '') {
-                        git_remote_config['credentialsId'] = params.OVERRIDE_GIT_CREDENTIALS_ID
-                    }
-                    
-                    checkout([
-                        $class: 'GitSCM',
-                        branches: [[name: git_treeish]],
-                        userRemoteConfigs: [git_remote_config]
-                    ])
-                }
-
-                // Print configuration for later debugging. 
-                sh "git config --list"
-                sh "git branch"
-
                 script {
+                    def overrideGit = false
+                    if (params.OVERRIDE_GIT_REPOSITORY != null) {
+                        if (params.OVERRIDE_GIT_REPOSITORY != '') {
+                            overrideGit = true
+                        }
+                    }
+
+                    if (overrideGit == false) {
+                        checkout scm
+                    } else {
+                        def gitTreeish = params.OVERRIDE_GIT_TREEISH
+                        def gitRemoteConfig = [:]
+                        gitRemoteConfig['url'] = params.OVERRIDE_GIT_REPOSITORY
+
+                        if (params.OVERRIDE_GIT_CREDENTIALS_ID != '') {
+                            gitRemoteConfig['credentialsId'] = params.OVERRIDE_GIT_CREDENTIALS_ID
+                        }
+                        
+                        checkout([
+                            $class: 'GitSCM',
+                            branches: [[name: gitTreeish]],
+                            userRemoteConfigs: [gitRemoteConfig]
+                        ])
+                    }
+
+                    // Print configuration for later debugging. 
+                    sh "git config --list"
+                    sh "git branch"
+
                     def vcdConnectionCredentialsID = params.VCD_CONNECTION_CREDENTIALS_ID
                     if (vcdConnectionCredentialsID.toLowerCase() == 'default') {
                         vcdConnectionCredentialsID = env.DEFAULT_VCD_CONNECTION_CREDENTIALS_ID
