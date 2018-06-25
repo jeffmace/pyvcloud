@@ -19,6 +19,9 @@ pipeline {
     }
     parameters {
         string(name: 'VCD_CONNECTION_CREDENTIALS_ID', defaultValue: 'Default')
+        string(name: 'OVERRIDE_GIT_REPOSITORY', defaultValue: '')
+        string(name: 'OVERRIDE_GIT_TREEISH', defaultValue: '')
+        string(name: 'OVERRIDE_GIT_CREDENTIALS_ID', defaultValue: '')
     }
     stages {
         stage('checkout') {
@@ -26,7 +29,31 @@ pipeline {
                 // Remove and checkout current branch from git using built-in
                 // Jenkins commands exposed in groovy. 
                 deleteDir()
-                checkout scm
+
+                def overrideGit = false
+                if (params.OVERRIDE_GIT_REPOSITORY != null) {
+                    if (params.OVERRIDE_GIT_REPOSITORY != '') {
+                        overrideGit = true
+                    }
+                }
+
+                if (overrideGit == false) {
+                    checkout scm
+                } else {
+                    def git_treeish = params.OVERRIDE_GIT_TREEISH
+                    def git_remote_config = [:]
+                    git_remote_config['url'] = params.OVERRIDE_GIT_REPOSITORY
+
+                    if (params.OVERRIDE_GIT_CREDENTIALS_ID != '') {
+                        git_remote_config['credentialsId'] = params.OVERRIDE_GIT_CREDENTIALS_ID
+                    }
+                    
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: git_treeish]],
+                        userRemoteConfigs: [git_remote_config]
+                    ])
+                }
 
                 // Print configuration for later debugging. 
                 sh "git config --list"
