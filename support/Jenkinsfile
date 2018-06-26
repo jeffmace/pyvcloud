@@ -62,6 +62,7 @@ pipeline {
                     sh "git branch"
 
                     externalMethods = load 'support/jenkinsMethods.groovy'
+                    externalMethods.buildCredentialsArray()
 
                     def vcdConnectionCredentialsID = params.VCD_CONNECTION_CREDENTIALS_ID
                     if (vcdConnectionCredentialsID.toLowerCase() == 'default') {
@@ -113,12 +114,9 @@ pipeline {
         }
         success { 
             echo "Job succeeded! Cleaning up system test environment"
-            sh """
-                set +x
-                . test-env/bin/activate
-                cd system_tests
-                ./run_system_tests.sh cleanup_test.py
-            """
+            script {
+                externalMethods.cleanupSystemTests(credentialsArray)
+            }
         }
     }
 }

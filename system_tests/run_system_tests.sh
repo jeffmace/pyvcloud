@@ -30,11 +30,6 @@ SRCROOT=`cd ..; pwd`
 cd $SRCROOT
 
 # Get connection information.  If provided the file name must be absolute. 
-
-if [ -n "$1" ]; then
-  VCD_CONNECTION=$1
-fi
-
 if [ -z "$VCD_CONNECTION" ]; then
   VCD_CONNECTION=$HOME/vcd_connection
   if [ -e $HOME/vcd_connection ]; then
@@ -98,7 +93,7 @@ run_system_tests_in_docker() {
     -v$SRCROOT:$SRCROOT \
     -w$SRCROOT \
     $DOCKER_IMAGE \
-    /bin/bash -c "system_tests/run_system_tests.sh"
+    /bin/bash -c "system_tests/run_system_tests.sh $*"
 }
 
 if [ "$PYTHON3_IN_DOCKER" == "" ]; then
@@ -119,7 +114,7 @@ if [ "$PYTHON3_IN_DOCKER" == "" ]; then
 fi
 
 if [ "$PYTHON3_IN_DOCKER" != "0" ]; then
-    run_system_tests_in_docker
+    run_system_tests_in_docker $*
 else
-    run_system_tests
+    run_system_tests $*
 fi
