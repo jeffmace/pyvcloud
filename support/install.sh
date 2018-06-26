@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 SHOME=`dirname $0`
 cd $SHOME
