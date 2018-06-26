@@ -1,7 +1,22 @@
-def buildCredentialsArray() {
-    println env
-    println params
-    println credentialsArray
+credentialsArray = []
+environmentArray = []
+
+def init() {
+    println "${env.WORKSPACE}"
+    println env.getEnvironment()
+
+    def vcdConnectionCredentialsID = params.VCD_CONNECTION_CREDENTIALS_ID
+    if (vcdConnectionCredentialsID.toLowerCase() == 'default') {
+        vcdConnectionCredentialsID = env.DEFAULT_VCD_CONNECTION_CREDENTIALS_ID
+    }
+
+    if (vcdConnectionCredentialsID.toLowerCase() != "") {
+        credentialsArray << [
+            $class: 'FileBinding', 
+            credentialsId: vcdConnectionCredentialsID,
+            variable: 'VCD_CONNECTION'
+        ]
+    }
 }
 
 def install() {
@@ -9,26 +24,26 @@ def install() {
     sh "support/install.sh"
 }
 
-def tox() {
+def runToxFlake8() {
     // Run tox. 
     sh "support/tox.sh"
 }
 
-def runSamples(credentialsArray) {
+def runSamples() {
     withCredentials(credentialsArray) {
         // Execute samples. 
         sh "examples/run_examples.sh"
     }
 }
 
-def runSystemTests(credentialsArray) {
+def runSystemTests() {
     withCredentials(credentialsArray) {
         // Run the default system test list. 
         sh "system_tests/run_system_tests.sh"
     }
 }
 
-def cleanupSystemTests(credentialsArray) {
+def cleanupSystemTests() {
     withCredentials(credentialsArray) {
         // Run the default system test list. 
         sh "system_tests/run_system_tests.sh cleanup_test.py"

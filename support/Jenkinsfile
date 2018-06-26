@@ -3,8 +3,6 @@
 // connection parameters. 
 
 externalMethods = null
-credentialsArray = []
-environmentArray = []
 
 // Pipeline definition.
 pipeline {
@@ -62,20 +60,7 @@ pipeline {
                     sh "git branch"
 
                     externalMethods = load 'support/jenkinsMethods.groovy'
-                    externalMethods.buildCredentialsArray()
-
-                    def vcdConnectionCredentialsID = params.VCD_CONNECTION_CREDENTIALS_ID
-                    if (vcdConnectionCredentialsID.toLowerCase() == 'default') {
-                        vcdConnectionCredentialsID = env.DEFAULT_VCD_CONNECTION_CREDENTIALS_ID
-                    }
-
-                    if (vcdConnectionCredentialsID.toLowerCase() != "") {
-                        credentialsArray << [
-                            $class: 'FileBinding', 
-                            credentialsId: vcdConnectionCredentialsID,
-                            variable: 'VCD_CONNECTION'
-                        ]
-                    }
+                    externalMethods.init()
                 }
             }
         }
@@ -89,21 +74,21 @@ pipeline {
         stage('run-tox-flake8') {
             steps {
         		script {
-                    externalMethods.tox()
+                    externalMethods.runToxFlake8()
                 }
             }
         }
         stage('run-samples') {
             steps {
                 script {
-                    externalMethods.runSamples(credentialsArray)
+                    externalMethods.runSamples()
                 }
             }
         }
         stage('run-system-test') {
             steps {
                 script {
-                    externalMethods.runSystemTests(credentialsArray)
+                    externalMethods.runSystemTests()
                 }
             }
         }
@@ -115,7 +100,7 @@ pipeline {
         success { 
             echo "Job succeeded! Cleaning up system test environment"
             script {
-                externalMethods.cleanupSystemTests(credentialsArray)
+                externalMethods.cleanupSystemTests()
             }
         }
     }
