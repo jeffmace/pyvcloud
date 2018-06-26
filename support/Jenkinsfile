@@ -2,6 +2,7 @@
 // This script depends on file $HOME/vcd_connection with valid vCD 
 // connection parameters. 
 
+def externalMethods = null
 def credentialsArray = []
 def environmentArray = []
 
@@ -60,6 +61,8 @@ pipeline {
                     sh "git config --list"
                     sh "git branch"
 
+                    externalMethods = load 'support/jenkinsMethods.groovy'
+
                     def vcdConnectionCredentialsID = params.VCD_CONNECTION_CREDENTIALS_ID
                     if (vcdConnectionCredentialsID.toLowerCase() == 'default') {
                         vcdConnectionCredentialsID = env.DEFAULT_VCD_CONNECTION_CREDENTIALS_ID
@@ -77,33 +80,29 @@ pipeline {
         }
         stage('install') {
             steps {
-                // Set up Python virtual environment and install pyvcloud. 
-                sh "support/install.sh"
+                script {
+                    externalMethods.install()
+                }
             }
         }
         stage('run-tox-flake8') {
             steps {
-        		// Run tox. 
-                sh "support/tox.sh"
+        		script {
+                    externalMethods.tox()
+                }
             }
         }
         stage('run-samples') {
             steps {
                 script {
-                    withCredentials(credentialsArray) {
-                        // Execute samples. 
-                        sh "examples/run_examples.sh"
-                    }
+                    externalMethods.runSamples(credentialsArray)
                 }
             }
         }
         stage('run-system-test') {
             steps {
                 script {
-                    withCredentials(credentialsArray) {
-                        // Run the default system test list. 
-                        sh "system_tests/run_system_tests.sh"
-                    }
+                    externalMethods.runSystemTests(credentialsArray)
                 }
             }
         }
