@@ -1,5 +1,4 @@
 credentialsArray = []
-environmentArray = []
 
 def init() {
     println "${env.WORKSPACE}"
@@ -49,5 +48,7 @@ def cleanupSystemTests() {
         sh "system_tests/run_system_tests.sh cleanup_test.py"
     }
 }
+
+init()
 
 return this

@@ -60,7 +60,7 @@ pipeline {
                     sh "git branch"
 
                     externalMethods = load 'support/jenkinsMethods.groovy'
-                    externalMethods.init()
+                    println credentialsArray
                 }
             }
         }
