@@ -2,9 +2,9 @@
 // This script depends on file $HOME/vcd_connection with valid vCD 
 // connection parameters. 
 
-def externalMethods = null
-def credentialsArray = []
-def environmentArray = []
+externalMethods = null
+credentialsArray = []
+environmentArray = []
 
 // Pipeline definition.
 pipeline {
