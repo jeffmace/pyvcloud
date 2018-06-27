@@ -16,7 +16,6 @@ SRCROOT=`cd ..; pwd`
 cd $SRCROOT
 
 # Get connection information.  If provided the file name must be absolute. 
-
 if [ -n "$1" ]; then
   VCD_CONNECTION=$1
 fi
@@ -31,66 +30,28 @@ if [ -z "$VCD_CONNECTION" ]; then
   fi
 fi
 
-run_examples() {
-  . test-env/bin/activate
-  . "$VCD_CONNECTION"
-
-  cd ${SRCROOT}/examples
-
-  # Prepare a sample tenant yaml file by cat'ing so that environment variables
-  # fill in. 
-  eval "cat <<EOF
-  $(<$SRCROOT/examples/tenant.yaml)
-EOF
-  " 2> /dev/null > sample-test-tenant.yaml
-
-  # From here on out all commands are logged. 
-  set -x
-  python3 system-info.py ${VCD_HOST} ${VCD_ORG} ${VCD_USER} ${VCD_PASSWORD}
-  python3 tenant-remove.py sample-test-tenant.yaml
-  python3 tenant-onboard.py sample-test-tenant.yaml
-  python3 list-vapps.py ${VCD_HOST} Test1 user1 secret VDC-A
-  python3 list-vdc-resources.py ${VCD_HOST} Test1 user1 secret
-}
-
-run_examples_in_docker() {
-  DOCKER_BUILD=`docker build -q \
-    --build-arg build_user=${USER} \
-    --build-arg build_uid=$(id -u) \
-    --build-arg build_gid=$(id -g) \
-    -f support/Dockerfile.build \
-    support`
-  DOCKER_IMAGE=`echo $DOCKER_BUILD | awk -F: '{print $2}'`
-
-  docker run --rm \
-    -ePYTHON3_IN_DOCKER=0 \
-    -eVCD_CONNECTION=$VCD_CONNECTION \
-    -v$VCD_CONNECTION:$VCD_CONNECTION \
-    -v$SRCROOT:$SRCROOT \
-    -w$SRCROOT \
-    $DOCKER_IMAGE \
-    /bin/bash -c "examples/run_examples.sh"
-}
-
-if [ "$PYTHON3_IN_DOCKER" == "" ]; then
-    PYTHON3_PATH=`which python3 | cat`
-    PIP3_PATH=`which pip3 | cat`
-
-    if [ "$PYTHON3_PATH" == "" ]; then
-        PYTHON3_IN_DOCKER=1
-    fi
-
-    if [ "$PIP3_PATH" == "" ]; then
-        PYTHON3_IN_DOCKER=1
-    fi
-fi
-
-if [ "$PYTHON3_IN_DOCKER" == "" ]; then
-    PYTHON3_IN_DOCKER=0
-fi
-
 if [ "$PYTHON3_IN_DOCKER" != "0" ]; then
-    run_examples_in_docker
+    run_in_docker examples/run_examples.sh
 else
-    run_examples
+    if [ -z "$VIRTUAL_ENV" ]; then
+        . $PYVCLOUD_VENV/bin/activate
+    fi
+    . "$VCD_CONNECTION"
+
+    cd ${SRCROOT}/examples
+
+    # Prepare a sample tenant yaml file by cat'ing so that environment variables
+    # fill in. 
+    eval "cat <<EOF
+    $(<$SRCROOT/examples/tenant.yaml)
+EOF
+    " 2> /dev/null > sample-test-tenant.yaml
+
+    # From here on out all commands are logged. 
+    set -x
+    python3 system-info.py ${VCD_HOST} ${VCD_ORG} ${VCD_USER} ${VCD_PASSWORD}
+    python3 tenant-remove.py sample-test-tenant.yaml
+    python3 tenant-onboard.py sample-test-tenant.yaml
+    python3 list-vapps.py ${VCD_HOST} Test1 user1 secret VDC-A
+    python3 list-vdc-resources.py ${VCD_HOST} Test1 user1 secret
 fi
