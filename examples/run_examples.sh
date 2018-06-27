@@ -30,6 +30,8 @@ if [ -z "$VCD_CONNECTION" ]; then
   fi
 fi
 
+. ./support/bashMethods.sh
+
 if [ "$PYTHON3_IN_DOCKER" != "0" ]; then
     run_in_docker examples/run_examples.sh
 else

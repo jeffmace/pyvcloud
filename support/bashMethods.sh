@@ -27,7 +27,7 @@ run_in_docker() {
     DOCKER_IMAGE=`echo $DOCKER_BUILD | awk -F: '{print $2}'`
 
     VCD_ARGS=""
-    if [ "$VCD_CONNECTION" != ""]; then
+    if [ "$VCD_CONNECTION" != "" ]; then
         VCD_ARGS="-eVCD_CONNECTION=$VCD_CONNECTION -v$VCD_CONNECTION:$VCD_CONNECTION"
     fi
 
