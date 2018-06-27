@@ -15,22 +15,9 @@ cd $SHOME
 SRCROOT=`cd ..; pwd`
 cd $SRCROOT
 
-# Get connection information.  If provided the file name must be absolute. 
-if [ -n "$1" ]; then
-  VCD_CONNECTION=$1
-fi
-
-if [ -z "$VCD_CONNECTION" ]; then
-  VCD_CONNECTION=$HOME/vcd_connection
-  if [ -e $HOME/vcd_connection ]; then
-    echo "Using default vcd_connection file location: $VCD_CONNECTION"
-  else
-    echo "Must have $VCD_CONNECTION or give alternative file as argument"
-    exit 0
-  fi
-fi
-
 . ./support/bashMethods.sh
+
+set_vcd_connection $1
 
 if [ "$PYTHON3_IN_DOCKER" != "0" ]; then
     run_in_docker examples/run_examples.sh

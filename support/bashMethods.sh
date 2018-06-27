@@ -17,6 +17,23 @@ if [ "$PYTHON3_IN_DOCKER" == "" ]; then
     PYTHON3_IN_DOCKER=0
 fi
 
+set_vcd_connection() {
+    # Get connection information.  If provided the file name must be absolute. 
+    if [ -n "$1" ]; then
+        VCD_CONNECTION=$1
+    fi
+
+    if [ -z "$VCD_CONNECTION" ]; then
+        VCD_CONNECTION=$HOME/vcd_connection
+        if [ -e $HOME/vcd_connection ]; then
+            echo "Using default vcd_connection file location: $VCD_CONNECTION"
+        else
+            echo "Must have $VCD_CONNECTION or give alternative file as argument"
+            exit 1
+        fi
+    fi
+}
+
 run_in_docker() {
     DOCKER_BUILD=`docker build -q \
         --build-arg build_user=${USER} \
@@ -39,4 +56,9 @@ run_in_docker() {
         -w$SRCROOT \
         $DOCKER_IMAGE \
         /bin/bash -c "$*"
+
+    EC=$?
+    if [ $EC -ne 0 ]; then
+        exit $EC
+    fi
 }
