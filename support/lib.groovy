@@ -82,7 +82,7 @@ def cleanupWorkspace() {
     // Remove temporary files
     temporaryFiles.each {
         println "Remove ${it}"
-        sh "if [ -f ${it} ]; then rm t; fi"
+        sh "if [ -f ${it} ]; then rm ${it}; fi"
     }
 }
 
