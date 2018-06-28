@@ -7,7 +7,7 @@ cd $SHOME
 SRCROOT=`cd ..; pwd`
 cd $SRCROOT
 
-. ./support/bashMethods.sh
+. ./support/lib.sh
 
 if [ "$PYTHON3_IN_DOCKER" != "0" ]; then
     run_in_docker support/tox.sh

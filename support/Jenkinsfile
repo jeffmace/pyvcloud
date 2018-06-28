@@ -6,7 +6,7 @@
 // * A Jenkins file-type credential named 'pyvcloud_vcd_connection'
 //   with the contents of a vcd_connection file.
 
-// Global variable to hold methods from the 'jenkinsMethods.groovy' file. 
+// Global variable to hold methods from the 'lib.groovy' file. 
 externalMethods = null
 
 // Pipeline definition.
@@ -83,7 +83,7 @@ pipeline {
             steps {
                 script {
                     // All code is available now, load the methods to do real work
-                    externalMethods = load 'support/jenkinsMethods.groovy'
+                    externalMethods = load 'support/lib.groovy'
                 }
             }
         }

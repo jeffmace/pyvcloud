@@ -29,7 +29,7 @@ cd $SHOME
 SRCROOT=`cd ..; pwd`
 cd $SRCROOT
 
-. ./support/bashMethods.sh
+. ./support/lib.sh
 
 set_vcd_connection
 
