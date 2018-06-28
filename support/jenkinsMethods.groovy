@@ -1,5 +1,6 @@
 // Declare this as a global variable so it can be used in all pipeline methods. 
 credentialsArray = []
+environmentArray = []
 
 def init() {
     // Determine if a credentials ID has been provided, or if the default should be used.
@@ -8,7 +9,13 @@ def init() {
         vcdConnectionCredentialsID = env.DEFAULT_VCD_CONNECTION_CREDENTIALS_ID
     }
 
-    if (vcdConnectionCredentialsID.toLowerCase() != "") {
+    // Check for a parameter containing the VCD_CONNECTION content
+    // Write that to a file if available, or use a Jenkins credential file
+    if (env.VCD_CONNECTION_CONTENTS != "") {
+        def tmpdir = pwd(tmp:true)
+        writeFile(file: "${tmpdir}/jenkins_vcd_connection", text: env.VCD_CONNECTION_CONTENTS)
+        environmentArray << "VCD_CONNECTION=${tmpdir}/jenkins_vcd_connection"
+    } else if (vcdConnectionCredentialsID.toLowerCase() != "") {
         // Ensure the path to a VCD parameters file is loaded into the appropriate
         // environment variable for testing scripts to use.
         credentialsArray << [
@@ -21,32 +28,42 @@ def init() {
 
 def install() {
     // Set up Python virtual environment and install pyvcloud. 
-    sh "support/install.sh"
+    withEnv(environmentArray) {
+        sh "support/install.sh"
+    }
 }
 
 def runToxFlake8() {
     // Run tox. 
-    sh "support/tox.sh"
+    withEnv(environmentArray) {
+        sh "support/tox.sh"
+    }
 }
 
 def runSamples() {
     withCredentials(credentialsArray) {
         // Execute samples. 
-        sh "examples/run_examples.sh"
+        withEnv(environmentArray) {
+            sh "examples/run_examples.sh"
+        }
     }
 }
 
 def runSystemTests() {
     withCredentials(credentialsArray) {
         // Run the default system test list. 
-        sh "system_tests/run_system_tests.sh"
+        withEnv(environmentArray) {
+            sh "system_tests/run_system_tests.sh"
+        }
     }
 }
 
 def cleanupSystemTests() {
     withCredentials(credentialsArray) {
         // Cleanup all system tests.  
-        sh "system_tests/run_system_tests.sh cleanup_test.py"
+        withEnv(environmentArray) {
+            sh "system_tests/run_system_tests.sh cleanup_test.py"
+        }
     }
 }
 
