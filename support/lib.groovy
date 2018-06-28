@@ -81,11 +81,8 @@ def cleanupSystemTests() {
 def cleanupWorkspace() {
     // Remove temporary files
     temporaryFiles.each {
-        def f = new File(it)
-        if (f.exists()) {
-            println "Remove ${it}"
-            f.delete()
-        }
+        println "Remove ${it}"
+        sh "if [ -f ${it} ]; then rm t; fi"
     }
 }
 
