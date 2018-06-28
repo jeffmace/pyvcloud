@@ -24,6 +24,9 @@ def init() {
             variable: 'VCD_CONNECTION'
         ]
     }
+
+    println environmentArray
+    println credentialsArray
 }
 
 def install() {
