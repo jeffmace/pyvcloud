@@ -23,7 +23,7 @@ if [ "$PYTHON3_IN_DOCKER" != "0" ]; then
     run_in_docker examples/run_examples.sh
 else
     if [ -z "$VIRTUAL_ENV" ]; then
-        . $PYVCLOUD_VENV/bin/activate
+        . $PYVCLOUD_VENV_DIR/bin/activate
     fi
     . "$VCD_CONNECTION"
 

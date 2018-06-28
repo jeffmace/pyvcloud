@@ -51,7 +51,7 @@ else
     fi
 
     if [ -z "$VIRTUAL_ENV" ]; then
-        . $PYVCLOUD_VENV/bin/activate
+        . $PYVCLOUD_VENV_DIR/bin/activate
     fi
     . "$VCD_CONNECTION"
 

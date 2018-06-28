@@ -1,4 +1,4 @@
-PYVCLOUD_VENV=${PYVCLOUD_VENV:-test-env}
+PYVCLOUD_VENV_DIR=${PYVCLOUD_VENV_DIR:-test-env}
 
 if [ "$PYTHON3_IN_DOCKER" == "" ]; then
     PYTHON3_PATH=`which python3 | cat`
@@ -50,7 +50,7 @@ run_in_docker() {
 
     docker run --rm \
         -ePYTHON3_IN_DOCKER=0 \
-        -ePYVCLOUD_VENV=$PYVCLOUD_VENV \
+        -ePYVCLOUD_VENV_DIR=$PYVCLOUD_VENV_DIR \
         $VCD_ARGS \
         -v$SRCROOT:$SRCROOT \
         -w$SRCROOT \

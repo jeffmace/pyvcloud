@@ -14,10 +14,10 @@ if [ "$PYTHON3_IN_DOCKER" != "0" ]; then
 else
     python3 --version
 
-    rm -rf $PYVCLOUD_VENV
-    python3 -m venv $PYVCLOUD_VENV
+    rm -rf $PYVCLOUD_VENV_DIR
+    python3 -m venv $PYVCLOUD_VENV_DIR
 
-    . $PYVCLOUD_VENV/bin/activate
+    . $PYVCLOUD_VENV_DIR/bin/activate
     pip3 install -r requirements.txt
-    python setup.py install
+    python3 setup.py install
 fi

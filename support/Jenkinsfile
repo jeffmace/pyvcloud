@@ -20,6 +20,7 @@ pipeline {
     environment {
         DEFAULT_VCD_CONNECTION_CREDENTIALS_ID = 'pyvcloud_vcd_connection'
         PYTHON3_IN_DOCKER = '1'
+        PYVCLOUD_VENV_DIR = 'jenkins-venv'
     }
     parameters {
         string(name: 'VCD_CONNECTION_CREDENTIALS_ID', defaultValue: 'Default',
@@ -33,6 +34,9 @@ pipeline {
         )
         string(name: 'OVERRIDE_GIT_CREDENTIALS_ID', defaultValue: '',
             description: 'A Jenkins credential ID to use when cloning from OVERRIDE_GIT_REPOSITORY.'
+        )
+        text(name: 'VCD_CONNECTION_CONTENTS',
+            description: 'The contents of a vcd_connection file to use for samples and system tests.'
         )
     }
     stages {
