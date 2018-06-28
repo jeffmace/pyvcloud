@@ -1,7 +1,14 @@
-// Declare this as a global variable so it can be used in all pipeline methods. 
+// This file contains methods used by Jenkinsfile to support the
+// Jenkins pipeline. The contents are loaded after the target
+// git repository is checked out.
+
+// Declare global variables so they can be used in all pipeline methods. 
 credentialsArray = []
 environmentArray = []
+temporaryFiles = []
 
+// Process job parameters and determine which credentials or environment
+// variables are required for proper processing.
 def init() {
     // Determine if a credentials ID has been provided, or if the default should be used.
     def vcdConnectionCredentialsID = params.VCD_CONNECTION_CREDENTIALS_ID
@@ -13,8 +20,12 @@ def init() {
     // Write that to a file if available, or use a Jenkins credential file
     if (env.VCD_CONNECTION_CONTENTS != "") {
         def tmpdir = pwd(tmp:true)
-        writeFile(file: "${tmpdir}/jenkins_vcd_connection", text: env.VCD_CONNECTION_CONTENTS)
-        environmentArray << "VCD_CONNECTION=${tmpdir}/jenkins_vcd_connection"
+        def vcdPath = "${tmpdir}/jenkins_vcd_connection"
+
+        println "Write VCD_CONNECTION_CONTENTS to ${vcdPath}"
+        writeFile(file: vcdPath, text: env.VCD_CONNECTION_CONTENTS)
+        environmentArray << "VCD_CONNECTION=${vcdPath}"
+        temporaryFiles << vcdPath
     } else if (vcdConnectionCredentialsID.toLowerCase() != "") {
         // Ensure the path to a VCD parameters file is loaded into the appropriate
         // environment variable for testing scripts to use.
@@ -24,9 +35,6 @@ def init() {
             variable: 'VCD_CONNECTION'
         ]
     }
-
-    println environmentArray
-    println credentialsArray
 }
 
 def install() {
@@ -66,6 +74,17 @@ def cleanupSystemTests() {
         // Cleanup all system tests.  
         withEnv(environmentArray) {
             sh "system_tests/run_system_tests.sh cleanup_test.py"
+        }
+    }
+}
+
+def cleanupWorkspace() {
+    // Remove temporary files
+    temporaryFiles.each {
+        def f = new File(it)
+        if (f.exists()) {
+            println "Remove ${it}"
+            f.delete()
         }
     }
 }

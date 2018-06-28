@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Copyright (c) 2018 VMware, Inc. All Rights Reserved.
 #
 # This product is licensed to you under the

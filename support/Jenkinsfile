@@ -119,11 +119,13 @@ pipeline {
     post { 
         failure { 
             echo "Job failed! System test environment will not be cleared."
+            externalMethods.cleanupWorkspace()
         }
         success { 
             echo "Job succeeded! Cleaning up system test environment"
             script {
                 externalMethods.cleanupSystemTests()
+                externalMethods.cleanupWorkspace()
             }
         }
     }
