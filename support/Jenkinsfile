@@ -35,7 +35,7 @@ pipeline {
         string(name: 'OVERRIDE_GIT_CREDENTIALS_ID', defaultValue: '',
             description: 'A Jenkins credential ID to use when cloning from OVERRIDE_GIT_REPOSITORY.'
         )
-        text(name: 'VCD_CONNECTION_CONTENTS',
+        text(name: 'VCD_CONNECTION_CONTENTS', defaultValue: '',
             description: 'The contents of a vcd_connection file to use for samples and system tests.'
         )
     }
@@ -120,14 +120,18 @@ pipeline {
         failure { 
             echo "Job failed! System test environment will not be cleared."
             script {
-                externalMethods.cleanupWorkspace()
+                if (externalMethods != null) {
+                    externalMethods.cleanupWorkspace()
+                }
             }
         }
         success { 
             echo "Job succeeded! Cleaning up system test environment"
             script {
-                externalMethods.cleanupSystemTests()
-                externalMethods.cleanupWorkspace()
+                if (externalMethods != null) {
+                    externalMethods.cleanupSystemTests()
+                    externalMethods.cleanupWorkspace()
+                }
             }
         }
     }
