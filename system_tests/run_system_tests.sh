@@ -29,8 +29,11 @@ cd $SHOME
 SRCROOT=`cd ..; pwd`
 cd $SRCROOT
 
+# Initialize the PYTHON3_IN_DOCKER variable and
+# load methods for interacting with Docker
 . ./support/lib.sh
 
+# Initialize the VCD_CONNECTION variable
 set_vcd_connection
 
 if [ "$PYTHON3_IN_DOCKER" != "0" ]; then
@@ -50,6 +53,7 @@ else
         TESTS=$*
     fi
 
+    # Detect if a Python virtualenv is already active
     if [ -z "$VIRTUAL_ENV" ]; then
         . $PYVCLOUD_VENV_DIR/bin/activate
     fi

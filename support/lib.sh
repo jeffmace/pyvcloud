@@ -1,5 +1,7 @@
 PYVCLOUD_VENV_DIR=${PYVCLOUD_VENV_DIR:-test-env}
 
+# Test the current environment for python3 and pip3
+# If not available, the requested script will be run inside Docker
 if [ "$PYTHON3_IN_DOCKER" == "" ]; then
     PYTHON3_PATH=`which python3 | cat`
     PIP3_PATH=`which pip3 | cat`
@@ -35,6 +37,9 @@ set_vcd_connection() {
 }
 
 run_in_docker() {
+    # Build the Docker image using the current uid/gid so
+    # repeat iterations of the Jenkins environment can 
+    # properly cleanup the workspace.
     DOCKER_BUILD=`docker build -q \
         --build-arg build_user=${USER} \
         --build-arg build_uid=$(id -u) \

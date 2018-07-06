@@ -7,6 +7,8 @@ cd $SHOME
 SRCROOT=`cd ..; pwd`
 cd $SRCROOT
 
+# Initialize the PYTHON3_IN_DOCKER variable and
+# load methods for interacting with Docker
 . ./support/lib.sh
 
 if [ "$PYTHON3_IN_DOCKER" != "0" ]; then
