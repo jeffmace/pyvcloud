@@ -90,6 +90,7 @@ pipeline {
         stage('install') {
             steps {
                 script {
+                    // Run this method from the lib.groovy file
                     externalMethods.install()
                 }
             }
@@ -97,6 +98,7 @@ pipeline {
         stage('run-tox-flake8') {
             steps {
         		script {
+                    // Run this method from the lib.groovy file
                     externalMethods.runToxFlake8()
                 }
             }
@@ -104,6 +106,7 @@ pipeline {
         stage('run-samples') {
             steps {
                 script {
+                    // Run this method from the lib.groovy file
                     externalMethods.runSamples()
                 }
             }
@@ -121,6 +124,7 @@ pipeline {
             echo "Job failed! System test environment will not be cleared."
             script {
                 if (externalMethods != null) {
+                    // Run this method from the lib.groovy file
                     externalMethods.cleanupWorkspace()
                 }
             }
@@ -129,6 +133,7 @@ pipeline {
             echo "Job succeeded! Cleaning up system test environment"
             script {
                 if (externalMethods != null) {
+                    // Run these methods from the lib.groovy file
                     externalMethods.cleanupSystemTests()
                     externalMethods.cleanupWorkspace()
                 }

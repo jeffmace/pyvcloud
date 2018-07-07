@@ -1,3 +1,5 @@
+# Intiialize the PYVCLOUD_VENV_DIR variable to set the
+# Python virtualenv directory for all pipeline scripts
 PYVCLOUD_VENV_DIR=${PYVCLOUD_VENV_DIR:-test-env}
 
 # Test the current environment for python3 and pip3
@@ -15,12 +17,14 @@ if [ "$PYTHON3_IN_DOCKER" == "" ]; then
     fi
 fi
 
+# Ensure the PYTHON3_IN_DOCKER variable is initialized for testing
 if [ "$PYTHON3_IN_DOCKER" == "" ]; then
     PYTHON3_IN_DOCKER=0
 fi
 
+# Ensure the VCD_CONNECTION variable is provided or set in the environment
 set_vcd_connection() {
-    # Get connection information.  If provided the file name must be absolute. 
+    # If provided the file name must be absolute. 
     if [ -n "$1" ]; then
         VCD_CONNECTION=$1
     fi
@@ -48,11 +52,14 @@ run_in_docker() {
         support`
     DOCKER_IMAGE=`echo $DOCKER_BUILD | awk -F: '{print $2}'`
 
+    # Include VCD_CONNECTION as a mounted file and environment variable
     VCD_ARGS=""
     if [ "$VCD_CONNECTION" != "" ]; then
         VCD_ARGS="-eVCD_CONNECTION=$VCD_CONNECTION -v$VCD_CONNECTION:$VCD_CONNECTION"
     fi
 
+    # Run the Docker container with source code mounted along
+    # with additional files and environment variables
     docker run --rm \
         -ePYTHON3_IN_DOCKER=0 \
         -ePYVCLOUD_VENV_DIR=$PYVCLOUD_VENV_DIR \

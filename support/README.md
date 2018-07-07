@@ -1,4 +1,4 @@
-# Pipeline support
+# Pipeline support directory
 
 This directory contains files and scripts to support the build and test of pyvcloud from a Jenkins pipeline or in Docker containers on a developer machine.
 
@@ -20,12 +20,12 @@ The Jenkins job will scan the repository and create jobs for all branches contai
 
 # Running the scripts locally
 
-When run locally, the scripts will use several factors to determine if they should be run in Docker.
+When run locally, the scripts will use several factors to determine if a Docker container will be started.
 
-* Is `python3` in `$PATH`
-* Is `pip3` in `$PATH`
-* Is `PYTHON3_IN_DOCKER` set to `0`, `1` or blank
+* Is `python3` in `$PATH`?
+* Is `pip3` in `$PATH`?
+* Is `$PYTHON3_IN_DOCKER` set to `0`, `1` or blank?
 
-If `PYTHON3_IN_DOCKER` is set to `0`, then Docker container will never be used. If it's set to `1`, then a Docker container will always be used.
+If `$PYTHON3_IN_DOCKER` is set to `0`, a Docker container will never be used. If it set to `1`, then a Docker container will always be used.
 
-Otherwise, the scripts will search for `python3` and `pip3` in the user environment. If available, the scripts will be run locally. A Docker container will be used if those commands are not available in the user environment.
+Otherwise, the scripts will search for `python3` and `pip3` in the user environment. If those commands are available, the scripts will be run locally. A Docker container will be used if those commands are not available in the user environment.
