@@ -42,6 +42,8 @@ if [ -z "$VIRTUAL_ENV" ]; then
     fi
 fi
 
+cd $SCRIPT_DIR
+
 # From here on out all commands are logged. 
 set -x
 python3 ${SCRIPT_DIR}/system-info.py ${VCD_HOST} ${VCD_ORG} ${VCD_USER} ${VCD_PASSWORD}
