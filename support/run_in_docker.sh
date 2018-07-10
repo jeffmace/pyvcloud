@@ -6,7 +6,7 @@ cd $SHOME
 SRCROOT=`cd ..; pwd`
 cd $SRCROOT
 
-# Intiialize the PYVCLOUD_VENV_DIR variable to set the
+# Initialize the PYVCLOUD_VENV_DIR variable to set the
 # Python virtualenv directory for all pipeline scripts
 VIRTUAL_ENV_DIR=${VIRTUAL_ENV_DIR:-auto.env}
 

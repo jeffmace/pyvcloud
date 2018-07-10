@@ -1,8 +1,12 @@
 # Pipeline support directory
 
-This directory contains files and scripts to support the build and test of pyvcloud from a Jenkins pipeline or in Docker containers on a developer machine.
+This directory contains files and scripts to support the build and test of 
+pyvcloud from a Jenkins pipeline or in Docker containers on a developer 
+machine.
 
-The following scripts in the repository have been updated to work as part of the pipeline or in a Docker container. Other scripts may depend on additional requirements or configuration.
+The following scripts in the repository have been updated to work as part of 
+the pipeline or in a Docker container. Other scripts may depend on additional 
+requirements or configuration.
 
 * `support/install.sh`
 * `support/tox.sh`
@@ -11,12 +15,19 @@ The following scripts in the repository have been updated to work as part of the
 
 # Jenkins configuration
 
-1. Make sure you have a Jenkins executor with the label `docker`. The executor should be configured with the Docker Engine running and so that the executor user can launch containers in Docker.
-1. Create a Jenkins credential with a file holding the contents of a file like `examples/vcd_connection.sample`. The ID of the credential should be set to `pyvcloud_vcd_connection`.
+1. Make sure you have a Jenkins executor with the label `docker`. The 
+   executor should be configured with the Docker Engine running and so 
+   that the executor user can launch containers in Docker.
+1. Create a Jenkins credential with a file holding the contents of a file 
+   like `examples/vcd_connection.sample`. The ID of the credential should 
+   be set to `pyvcloud_vcd_connection`.
 1. Install the `Pipeline: Multibranch` plugin along with all dependencies.
-1. Add a `Multibranch Pipeline` job to Jenkins that pulls from your Git repository and reads the Jenkinsfile from `support/Jenkinsfile`.
+1. Add a `Multibranch Pipeline` job to Jenkins that pulls from your Git 
+   repository and reads the Jenkinsfile from `support/Jenkinsfile`.
 
-The Jenkins job will scan the repository and create jobs for all branches containing the `support/Jenkinsfile` file. You can configure the job to run periodically or start it manually.
+The Jenkins job will scan the repository and create jobs for all branches 
+containing the `support/Jenkinsfile` file. You can configure the job to run 
+periodically or start it manually.
 
 # Running the scripts locally
 
